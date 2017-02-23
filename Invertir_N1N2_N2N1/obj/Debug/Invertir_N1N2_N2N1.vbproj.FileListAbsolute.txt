@@ -1,0 +1,12 @@
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\Invertir_N1N2_N2N1\bin\Debug\Invertir_N1N2_N2N1.exe.config
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\bin\Debug\Invertir_N1N2_N2N1.exe.config
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\bin\Debug\Invertir_N1N2_N2N1.exe
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\bin\Debug\Invertir_N1N2_N2N1.pdb
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\bin\Debug\Invertir_N1N2_N2N1.xml
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.vbprojResolveAssemblyReference.cache
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.FrmInvertirNudos.resources
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.Resources.resources
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.vbproj.GenerateResource.Cache
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.exe
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.xml
+E:\ConectarAPIEpanet\2.VB.Net\Cap.5\Practica_05\Invertir_N1N2_N2N1\obj\Debug\Invertir_N1N2_N2N1.pdb
