@@ -68,7 +68,7 @@ Public Class FrmInvertirNudos
         'Almacenar información de la sección [PIPES], [COORDENATES], [VERTICES], [TIMES]
         'Recuperar los caudales de las tuberías en todo el periodo de simulación
 
-        Dim i, Err, tt, ii, ttt, L As Integer
+        Dim i, Err, tt, ttt, L As Integer
         Dim indN1, indN2 As Integer
         Dim valor As Single
         Dim ID As New StringBuilder(32)
@@ -84,7 +84,7 @@ Public Class FrmInvertirNudos
         'Recorrer todas las líneas y obtener información
         For L = 1 To numLineas
 
-            'Instancear objeto
+            'Instancear objetos
             Linea(L).ListaQ = New Collection
             Linea(L).VertX = New Collection
             Linea(L).VertY = New Collection
@@ -118,27 +118,27 @@ Public Class FrmInvertirNudos
 
             'Recuperar el estado inicial
             Err = ENgetlinkvalue(L, EN_INITSTATUS, valor)
-            If valor = 0 Then Linea(L).EstadoIni = "Close"
+            If valor = 0 Then Linea(L).EstadoIni = "Closed"
             If valor = 1 Then Linea(L).EstadoIni = "Open"
+            Err = ENgetlinktype(L, valor)
+            If valor = EN_CVPIPE Then Linea(L).EstadoIni = "CV"
 
         Next
 
         'Realizar cálculo hidráulico y obtener el caudal
-        i = 0
-        Err = ENopenH : If i <> 0 Then Stop
-        Err = ENinitH(1) : If i <> 0 Then Stop
+        Err = ENopenH : If Err <> 0 Then Stop
+        Err = ENinitH(1) : If Err <> 0 Then Stop
         Do
-            Err = ENrunH(tt) : If ii > 6 Then Stop
+            Err = ENrunH(tt) : If Err > 6 Then Stop
             For L = 1 To numLineas
                 Err = ENgetlinkvalue(L, EN_FLOW, valor)
                 Linea(L).ListaQ.Add(valor)
             Next L
-            ii = ENnextH(ttt)
+            Err = ENnextH(ttt)
         Loop Until ttt = 0
         Err = ENcloseH
 
-        'Clasificar las líneas a invertir sus nudos extremos si se cumple la condición
-        'Para cada línea, si Q < 0 en todo el periodo
+        'Identificar las tuberías si se cumple la condición de: Q < 0 en todo el periodo
         Dim Invertir As Boolean
         Dim Q As Single
 
@@ -222,6 +222,8 @@ Public Class FrmInvertirNudos
         Dim i, j As Integer
         Dim Err, valor As Integer
 
+        Dim nTuberias As Integer
+        nTuberias = 0
 
         pathResult = pathInp.Substring(0, Len(pathInp) - 4) & "_Result.inp"
         seccActual = vbNullString
@@ -236,67 +238,77 @@ Public Class FrmInvertirNudos
         Err = ENopen(pathInp, pathRpt, pathOut)
 
         While Not sr.EndOfStream
+
             line = sr.ReadLine()
             line = Trim(Replace(line, Chr(9), " "))
+
             If Len(line) > 0 Then
 
                 If line.Substring(0, 1) = "[" Then seccActual = line
-                If seccActual <> "[PIPES]" And seccActual <> "[VERTICES]" Then seccActual = vbNullString
 
-                If line.Substring(0, 1) <> "[" And line.Substring(0, 1) <> ";" And seccActual = "[PIPES]" Then
+                If seccActual <> "[PIPES]" And seccActual <> "[VERTICES]" Then sw.WriteLine(line)
 
-                    For i = 1 To numLineas
-                        Err = ENgetlinktype(i, valor)
-                        If valor = EN_PIPE Then
-                            If Linea(i).InvertNudos = False Then
-                                sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).IDN1 & Space(16) & Linea(i).IDN2 & Space(16) &
+                If seccActual = "[PIPES]" Then
+                    If line.Substring(0, 1) <> "[" And line.Substring(0, 1) <> ";" Then
+                        For i = 1 To numLineas
+                            Err = ENgetlinktype(i, valor)
+                            If valor = EN_PIPE Or valor = EN_CVPIPE Then
+                                nTuberias = nTuberias + 1
+                                If Linea(i).InvertNudos = False Then
+                                    sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).IDN1 & Space(16) & Linea(i).IDN2 & Space(16) &
                                              Linea(i).Longitud & Space(16) & Linea(i).Diametro & Space(16) &
                                              Linea(i).Rugosidad & Space(16) & Linea(i).PerdMen & Space(16) & Linea(i).EstadoIni)
-                            Else
-                                sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).IDN2 & Space(16) & Linea(i).IDN1 & Space(16) &
+                                Else
+                                    sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).IDN2 & Space(16) & Linea(i).IDN1 & Space(16) &
                                              Linea(i).Longitud & Space(16) & Linea(i).Diametro & Space(16) &
                                              Linea(i).Rugosidad & Space(16) & Linea(i).PerdMen & Space(16) & Linea(i).EstadoIni)
+                                End If
+                                line = sr.ReadLine()
                             End If
-                            line = sr.ReadLine()
-                        End If
-                    Next
-                    sw.WriteLine("")
+                        Next
+                        sw.WriteLine("")
+                    Else
+                        sw.WriteLine(line)
+                    End If
+                End If
 
-                ElseIf line.Substring(0, 1) <> "[" And line.Substring(0, 1) <> ";" And seccActual = "[VERTICES]" Then
-
-                    For i = 1 To numLineas
-                        Err = ENgetlinktype(i, valor)
-                        If valor = EN_PIPE Then
-                            If Linea(i).InvertNudos = True Then
-                                For j = Linea(i).VertX.Count To 1 Step -1
-                                    sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).VertX(j) & Space(16) & Linea(i).VertY(j))
-                                    line = sr.ReadLine()
-                                Next
-                            ElseIf Linea(i).InvertNudos = False Then
+                If seccActual = "[VERTICES]" Then
+                    If line.Substring(0, 1) <> "[" And line.Substring(0, 1) <> ";" Then
+                        For i = 1 To numLineas
+                            Err = ENgetlinktype(i, valor)
+                            If valor = EN_PIPE Then
+                                If Linea(i).InvertNudos = True Then
+                                    For j = Linea(i).VertX.Count To 1 Step -1
+                                        sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).VertX(j) & Space(16) & Linea(i).VertY(j))
+                                        line = sr.ReadLine()
+                                    Next
+                                ElseIf Linea(i).InvertNudos = False Then
+                                    For j = 1 To Linea(i).VertX.Count
+                                        sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).VertX(j) & Space(16) & Linea(i).VertY(j))
+                                        line = sr.ReadLine()
+                                    Next
+                                End If
+                            End If
+                            If valor <> EN_PIPE Then
                                 For j = 1 To Linea(i).VertX.Count
                                     sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).VertX(j) & Space(16) & Linea(i).VertY(j))
                                     line = sr.ReadLine()
                                 Next
                             End If
-                        End If
-                        If valor <> EN_PIPE Then
-                            For j = 1 To Linea(i).VertX.Count
-                                sw.WriteLine(Linea(i).ID & Space(16) & Linea(i).VertX(j) & Space(16) & Linea(i).VertY(j))
-                                line = sr.ReadLine()
-                            Next
-                        End If
-                    Next
-                    sw.WriteLine("")
-
-                Else
-                    sw.WriteLine(line)
+                        Next
+                        sw.WriteLine("")
+                    Else
+                        sw.WriteLine(line)
+                    End If
                 End If
             Else
                 sw.WriteLine(line)
             End If
+
         End While
 
         Err = ENclose()
+
         sw.Close()
         fw.Dispose()
         sr.Close()
