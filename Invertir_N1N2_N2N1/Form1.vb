@@ -57,9 +57,9 @@ Public Class FrmInvertirNudos
         If numTubmalTrazadas > 0 Then
             EscribirFicheroInp(DirInp, DirRpt, DirOut)
             EscribirFicheroTexto(DirInp)
-            MessageBox.Show("Existe " + CStr(numTubmalTrazadas) + " línea(s) mal trazada(s)")
+            MessageBox.Show("Existe " + CStr(numTubmalTrazadas) + " línea(s) mal trazada(s)", "Informe")
         Else
-            MessageBox.Show("No existe líneas mal trazadas")
+            MessageBox.Show("No existe líneas mal trazadas", "Informe")
         End If
 
     End Sub
@@ -102,19 +102,19 @@ Public Class FrmInvertirNudos
 
             'Recuperar la longitud
             Err = ENgetlinkvalue(L, EN_LENGTH, valor)
-            Linea(L).Longitud = valor
+            Linea(L).Longitud = SepDec(valor)
 
             'Recuperar el diámetro
             Err = ENgetlinkvalue(L, EN_DIAMETER, valor)
-            Linea(L).Diametro = valor
+            Linea(L).Diametro = SepDec(valor)
 
             'Recuperar la rugosidad
             Err = ENgetlinkvalue(L, EN_ROUGHNESS, valor)
-            Linea(L).Rugosidad = valor
+            Linea(L).Rugosidad = SepDec(valor)
 
             'Recuperar las pérdidas menores
             Err = ENgetlinkvalue(L, EN_MINORLOSS, valor)
-            Linea(L).PerdMen = valor
+            Linea(L).PerdMen = SepDec(valor)
 
             'Recuperar el estado inicial
             Err = ENgetlinkvalue(L, EN_INITSTATUS, valor)
@@ -339,5 +339,19 @@ Public Class FrmInvertirNudos
         sw.Close()
 
     End Sub
+
+    Private Function SepDec(valor As String) As String
+
+        Dim i As Int32
+
+        i = InStr(valor, ",")
+
+        If i > 0 Then
+            SepDec = valor.Replace(",", ".")
+        Else
+            SepDec = valor
+        End If
+
+    End Function
 
 End Class
